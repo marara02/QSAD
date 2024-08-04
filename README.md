@@ -2,6 +2,9 @@
 
 A new Flutter project.
 
+Saving sensors data to csv and show graph of changes for driving session.
+![img.png](img.png)
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
