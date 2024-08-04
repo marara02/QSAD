@@ -6,7 +6,7 @@ import 'gyroscope.dart';
 
 Future<void> writeDataToCsv(List<AccelerometerData> accelerometerData, List<GyroscopeData> gyroscopeData) async{
   List<List<dynamic>> csvData = [
-    ["Timestamp", "Acc_X", "Acc_Y", "Acc_Z", "Gyro_X", "Gyro_Y", "Gyro_Z"]
+    ["Timestamp", "AccX", "AccY", "AccZ", "GyroX", "GyroY", "GyroZ"]
   ];
 
   int length = accelerometerData.length > gyroscopeData.length ? accelerometerData.length : gyroscopeData.length;
