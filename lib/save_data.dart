@@ -4,10 +4,11 @@ import 'dart:io';
 import 'accelerometer.dart';
 import 'gyroscope.dart';
 
-Future<void> writeDataToCsv(List<AccelerometerData> accelerometerData, List<GyroscopeData> gyroscopeData) async{
+Future<List<Map<String, dynamic>>> writeDataToCsv(List<AccelerometerData> accelerometerData, List<GyroscopeData> gyroscopeData) async{
   List<List<dynamic>> csvData = [
-    ["Timestamp", "AccX", "AccY", "AccZ", "GyroX", "GyroY", "GyroZ"]
+    ["AccX", "AccY", "AccZ", "GyroX", "GyroY", "GyroZ", "Timestamp",]
   ];
+  List<Map<String, dynamic>> jsonData = [];
 
   int length = accelerometerData.length > gyroscopeData.length ? accelerometerData.length : gyroscopeData.length;
 
@@ -20,8 +21,20 @@ Future<void> writeDataToCsv(List<AccelerometerData> accelerometerData, List<Gyro
     double? gyrY = i < gyroscopeData.length ? gyroscopeData[i].value[1] : null;
     double? gyrZ = i < gyroscopeData.length ? gyroscopeData[i].value[2] : null;
 
-    List<dynamic> row = [time, accX, accY, accZ, gyrX, gyrY, gyrZ];
+    List<dynamic> row = [accX, accY, accZ, gyrX, gyrY, gyrZ, time];
     csvData.add(row);
+
+    // Save data in json format
+    Map<String, dynamic> jsonItem = {
+      "AccX": accX,
+      "AccY": accY,
+      "AccZ": accZ,
+      "GyroX": gyrX,
+      "GyroY": gyrY,
+      "GyroZ": gyrZ,
+      "Timestamp": time
+    };
+    jsonData.add(jsonItem);
   }
 
   String csv = const ListToCsvConverter().convert(csvData);
@@ -32,4 +45,6 @@ Future<void> writeDataToCsv(List<AccelerometerData> accelerometerData, List<Gyro
 
   await file.writeAsString(csv);
   print('Data written to $path');
+  print(jsonData[0]);
+  return jsonData;
 }
