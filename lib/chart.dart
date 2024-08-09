@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'accelerometer.dart';
-import 'gyroscope.dart';
+import 'sensorsData/accelerometer.dart';
+import 'sensorsData/gyroscope.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class ChartScreen extends StatefulWidget {

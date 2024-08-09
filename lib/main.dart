@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-import 'accelerometer.dart';
+import 'sensorsData/accelerometer.dart';
+import 'drowsinessDetect/camera.dart';
 import 'chart.dart';
-import 'gyroscope.dart';
+import 'sensorsData/gyroscope.dart';
 import 'save_data.dart';
-import 'euler_sensors_data.dart';
+import 'sensorsData/euler_sensors_data.dart';
+import 'package:http/http.dart' as http;
+
 
 void main() {
   runApp(const MyApp());
@@ -129,6 +133,13 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onPressed: _stopCollectingData,
           ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+            ),
+            onPressed: _openCamera,
+            child: const Text("Camera"),
+          ),
         ],
       ),
     );
@@ -185,7 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _gyroscopeData.clear();
     }
 
-    _dataTimer?.cancel(); // Cancel any existing timer
+    // _dataTimer?.cancel(); // Cancel any existing timer
 
     // Set up a timer to process data every 0.5 seconds
     _dataTimer = Timer.periodic(const Duration(milliseconds: 500), (Timer timer) {
@@ -198,12 +209,30 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _stopCollectingData() async {
+    _dataTimer?.cancel();
     for (final subscription in _streamSubscriptions) {
       subscription.cancel();
     }
+    // _streamSubscriptions.clear(); // Clear the list of subscriptions
 
-    print("length: ${_accelerometerData.length}");
-    await writeDataToCsv(_accelerometerData, _gyroscopeData);
+
+    List<dynamic> dataLst = await writeDataToCsv(_accelerometerData, _gyroscopeData);
+    final response = await http.post(
+      Uri.parse('https://backapi-okqa.onrender.com/predict'),
+      headers: <String, String>{
+        'Content-Type':'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(dataLst),
+    );
+
+    if(response.statusCode == 200){
+      List<dynamic> predictions = jsonDecode(response.body);
+      print("Predictions: $predictions");
+    }
+    else{
+      throw Exception('Failed to get predictions: ${response.statusCode}');
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -213,6 +242,12 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  void _openCamera(){
+    Navigator.push(
+        context, MaterialPageRoute(
+        builder: (context) => CameraScreen()));
   }
 
   void _processSensorData(List<double> accelValues, List<double> gyroValues) {
