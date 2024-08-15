@@ -34,23 +34,23 @@ class _ChartScreenState extends State<ChartScreen> {
                     dataSource: widget.accelerometerData,
                     xValueMapper: (AccelerometerData value, _) => value.getDate,
                     yValueMapper: (AccelerometerData value, _) => value.getValue[0],
-                    name: 'X',
+                    name: 'X'),
                     // Enable data label
-                    dataLabelSettings: const DataLabelSettings(isVisible: true)),
+                    //dataLabelSettings: const DataLabelSettings(isVisible: true)),
                 LineSeries<AccelerometerData, DateTime>(
                     dataSource: widget.accelerometerData,
                     xValueMapper: (AccelerometerData value, _) => value.getDate,
                     yValueMapper: (AccelerometerData value, _) => value.getValue[1],
-                    name: 'Y',
+                    name: 'Y'),
                     // Enable data label
-                    dataLabelSettings: const DataLabelSettings(isVisible: true)),
+                    //dataLabelSettings: const DataLabelSettings(isVisible: true)),
                 LineSeries<AccelerometerData, DateTime>(
                     dataSource: widget.accelerometerData,
                     xValueMapper: (AccelerometerData value, _) => value.getDate,
                     yValueMapper: (AccelerometerData value, _) => value.getValue[2],
-                    name: 'Z',
+                    name: 'Z'),
                     // Enable data label
-                    dataLabelSettings: const DataLabelSettings(isVisible: true))
+                    // dataLabelSettings: const DataLabelSettings(isVisible: true))
               ]),
           SfCartesianChart(
               primaryXAxis: CategoryAxis(),
@@ -65,23 +65,23 @@ class _ChartScreenState extends State<ChartScreen> {
                     dataSource: widget.gyroscopeData,
                     xValueMapper: (GyroscopeData value, _) => value.getDate,
                     yValueMapper: (GyroscopeData value, _) => value.getValue[0],
-                    name: 'X',
+                    name: 'X'),
                     // Enable data label
-                    dataLabelSettings: const DataLabelSettings(isVisible: true)),
+                    //dataLabelSettings: const DataLabelSettings(isVisible: true)),
                 LineSeries<GyroscopeData, DateTime>(
                     dataSource: widget.gyroscopeData,
                     xValueMapper: (GyroscopeData value, _) => value.getDate,
                     yValueMapper: (GyroscopeData value, _) => value.getValue[1],
-                    name: 'Y',
+                    name: 'Y'),
                     // Enable data label
-                    dataLabelSettings: const DataLabelSettings(isVisible: true)),
+                    // dataLabelSettings: const DataLabelSettings(isVisible: true)),
                 LineSeries<GyroscopeData, DateTime>(
                     dataSource: widget.gyroscopeData,
                     xValueMapper: (GyroscopeData value, _) => value.getDate,
                     yValueMapper: (GyroscopeData value, _) => value.getValue[2],
-                    name: 'Z',
+                    name: 'Z'),
                     // Enable data label
-                    dataLabelSettings: const DataLabelSettings(isVisible: true))
+                    // dataLabelSettings: const DataLabelSettings(isVisible: true))
               ]),
           // Expanded(
           //   child: Padding(

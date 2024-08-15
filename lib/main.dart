@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:safedriving/auth/login.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'auth/login_or_reg.dart';
 import 'sensorsData/accelerometer.dart';
 import 'drowsinessDetect/camera.dart';
 import 'chart.dart';
@@ -11,8 +13,8 @@ import 'save_data.dart';
 import 'sensorsData/euler_sensors_data.dart';
 import 'package:http/http.dart' as http;
 
-
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -27,7 +29,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.teal,
       ),
-      home: const MyHomePage(title: 'Flutter Sensor Data Home Page'),
+      home: const LoginOrReg(),
+      // home: const MyHomePage(title: 'Flutter Sensor Data Home Page'),
     );
   }
 }
@@ -133,13 +136,13 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onPressed: _stopCollectingData,
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            ),
-            onPressed: _openCamera,
-            child: const Text("Camera"),
-          ),
+          // ElevatedButton(
+          //   style: ElevatedButton.styleFrom(
+          //   backgroundColor: Colors.green,
+          //   ),
+          //   onPressed: _openCamera,
+          //   child: const Text("Camera"),
+          // ),
         ],
       ),
     );
@@ -244,11 +247,11 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _openCamera(){
-    Navigator.push(
-        context, MaterialPageRoute(
-        builder: (context) => CameraScreen()));
-  }
+  // void _openCamera(){
+  //   Navigator.push(
+  //       context, MaterialPageRoute(
+  //       builder: (context) => EyeDetectionScreen()));
+  // }
 
   void _processSensorData(List<double> accelValues, List<double> gyroValues) {
     // Provide default values if necessary (though not needed here)
