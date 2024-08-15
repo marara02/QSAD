@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:safedriving/components/button.dart';
 import 'package:safedriving/components/textfield.dart';
+import 'package:intl/intl.dart';
 
 class RegisterPage extends StatefulWidget{
   final Function()? onTap;
@@ -16,7 +18,37 @@ class _RegisterPageState extends State<RegisterPage>{
   final confirmPasswordController = TextEditingController();
   final firstnameTextController = TextEditingController();
   final lastnameTextController = TextEditingController();
+  final dateBirthController = TextEditingController();
 
+  Future<void> signUp() async {
+    showDialog(
+        context: context,
+        builder: (context) => const Center(
+      child: CircularProgressIndicator(),
+    ));
+    if(passwordTextController.text != confirmPasswordController.text){
+      Navigator.pop(context);
+      displayMessage("Passwords don't match");
+      return;
+    }
+    try{
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailTextController.text,
+          password: passwordTextController.text
+      );
+      if(context.mounted) Navigator.pop(context);
+    } on FirebaseAuthException catch(e){
+      Navigator.pop(context);
+      displayMessage(e.code);
+    }
+  }
+  void displayMessage(String message){
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(message),
+        ));
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,10 +106,32 @@ class _RegisterPageState extends State<RegisterPage>{
                     hintText: 'Confirm Password',
                     obscureText: true
                 ),
-                const SizedBox(height: 25),
 
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: TextField(
+                    controller: dateBirthController,
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      fillColor: Colors.grey[200],
+                      filled: true,
+                      hintText: 'Date of birth',
+                      hintStyle: TextStyle(color: Colors.grey[500]),
+                    ),
+                    onTap: () => onTapFunction(context: context),
+                  ),
+                ),
+
+                const SizedBox(height: 25),
                 MyButton(
-                    onTap: (){},
+                    onTap: signUp,
                     text: 'Register',
                 ),
 
@@ -112,5 +166,15 @@ class _RegisterPageState extends State<RegisterPage>{
         ),
       )
     );
+  }
+  onTapFunction({required BuildContext context}) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      lastDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      initialDate: DateTime.now(),
+    );
+    if (pickedDate == null) return;
+    dateBirthController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
   }
 }
