@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:safedriving/sensorsData/driving_result.dart';
 import 'sensorsData/accelerometer.dart';
 import 'sensorsData/gyroscope.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class ChartScreen extends StatefulWidget {
-  const ChartScreen({Key? key, required this.accelerometerData, required this.gyroscopeData}) : super(key: key);
+  const ChartScreen({super.key, required this.accelerometerData, required this.gyroscopeData, required this.drivingResult});
   final List<AccelerometerData> accelerometerData;
   final List<GyroscopeData> gyroscopeData;
+  final DrivingResult? drivingResult;
 
   @override
   State<ChartScreen> createState() => _ChartScreenState();
@@ -83,6 +85,22 @@ class _ChartScreenState extends State<ChartScreen> {
                     // Enable data label
                     // dataLabelSettings: const DataLabelSettings(isVisible: true))
               ]),
+
+          const SizedBox(height: 30),
+          const Text(
+            "Driving Result",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          Text("Date: ${widget.drivingResult?.getDate.toLocal()}",
+              style: const TextStyle(fontSize: 18)),
+          const SizedBox(height: 10),
+          Text("Aggressive rate: ${widget.drivingResult?.getAggressiveRate}",
+              style: const TextStyle(fontSize: 18)),
+          const SizedBox(height: 10),
+          Text("Normal rate: ${widget.drivingResult?.getNormalRate}",
+              style: const TextStyle(fontSize: 18))
+
           // Expanded(
           //   child: Padding(
           //     padding: const EdgeInsets.all(8.0),

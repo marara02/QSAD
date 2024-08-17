@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:safedriving/pages/mainPage.dart';
+import '../components/navBar.dart';
 import '../pages/homePage.dart';
 import 'login_or_reg.dart';
 
@@ -13,7 +15,7 @@ class AuthPage extends StatelessWidget{
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot){
           if(snapshot.hasData){
-            return const MyHomePage();
+            return const NavigationExample();
           }
           else{
             return const LoginOrReg();

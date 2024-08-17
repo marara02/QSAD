@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:safedriving/auth/login.dart';
+import 'package:safedriving/sensorsData/driving_result.dart';
+import 'package:safedriving/services/add_data.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:safedriving/save_data.dart';
 import 'package:safedriving/auth/login_or_reg.dart';
@@ -34,10 +37,14 @@ class _MyHomePageState extends State<MyHomePage> {
   final double _samplingInterval = 0.5;
   List<AccelerometerData> _accelerometerData = [];
   List<GyroscopeData> _gyroscopeData = [];
+  DrivingResult? drivingResult;
   List<double>? _latestAccelValues;
   List<double>? _latestGyroValues;
   Timer? _dataTimer;
   int backAndForth = 0;
+
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  CloudFirestoreService? service;
 
   void signOut() {
     FirebaseAuth.instance.signOut();
@@ -147,6 +154,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    service = CloudFirestoreService(FirebaseFirestore.instance);
+
 
     // Listen to accelerometer events
     _streamSubscriptions.add(
@@ -219,8 +228,38 @@ class _MyHomePageState extends State<MyHomePage> {
     );
 
     if(response.statusCode == 200){
-      List<dynamic> predictions = jsonDecode(response.body);
-      print("Predictions: $predictions");
+      List<dynamic> predictionsList = jsonDecode(response.body);
+
+      // Assuming you want the first item in the list
+      if (predictionsList.isNotEmpty) {
+        Map<String, dynamic> item = predictionsList[0];
+        final String? email = currentUser.email;
+        String currEmail;
+        // Create DrivingResult using values from the first item
+        if(email != null ){
+          currEmail = email;
+          drivingResult = DrivingResult(
+              currEmail,
+              DateTime.now(),
+              item['AGGRESSIVE'],
+              item['NORMAL'],
+              0.0,
+              50
+          );
+
+          service?.add({
+            'username': currEmail,
+            'time': DateTime.now(),
+            'aggressiveRate': item['AGGRESSIVE'],
+            'normalRate': item['NORMAL'],
+            'drowsyRate': 0,
+            'safetyScore': 70
+          });
+        }
+        print("First Prediction: $item");
+      } else {
+        print("The predictions list is empty.");
+      }
     }
     else{
       throw Exception('Failed to get predictions: ${response.statusCode}');
@@ -232,6 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context) => ChartScreen(
           accelerometerData: _accelerometerData,
           gyroscopeData: _gyroscopeData,
+          drivingResult: drivingResult
         ),
       ),
     );
