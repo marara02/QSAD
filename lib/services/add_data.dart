@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CloudFirestoreService{
   final FirebaseFirestore db;
@@ -11,6 +12,7 @@ class CloudFirestoreService{
   }
 
   Stream<QuerySnapshot<Map<String, dynamic>>> getDrivingStory(){
-    return db.collection('drivingSession').snapshots();
+    return db.collection('drivingSession')
+        .where('username', isEqualTo: FirebaseAuth.instance.currentUser!.email).snapshots();
   }
 }

@@ -11,6 +11,7 @@
 migrate_working_dir/
 ./lib/firebase_options.dart
 firebase.json
+./assets/images/*
 
 # IntelliJ related
 *.iml

@@ -1,31 +1,20 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_month_picker/flutter_custom_month_picker.dart';
-import 'package:safedriving/auth/login.dart';
-import 'package:sensors_plus/sensors_plus.dart';
-import 'package:safedriving/save_data.dart';
-import 'package:safedriving/auth/login_or_reg.dart';
-import 'package:safedriving/sensorsData/accelerometer.dart';
-import 'package:safedriving/drowsinessDetect/camera.dart';
-import 'package:safedriving/chart.dart';
-import 'package:safedriving/sensorsData/gyroscope.dart';
-import 'package:safedriving/save_data.dart';
-import 'package:safedriving/sensorsData/euler_sensors_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_gauges/gauges.dart';
-
-import '../components/navBar.dart';
 import '../services/add_data.dart';
+import 'package:intl/intl.dart';
 
 class MainPage extends StatelessWidget {
   MainPage({super.key});
 
   final currentUser = FirebaseAuth.instance.currentUser!;
-  CloudFirestoreService service = CloudFirestoreService(FirebaseFirestore.instance);
+  CloudFirestoreService service =
+      CloudFirestoreService(FirebaseFirestore.instance);
+
+  final dateFormatter = DateFormat('dd-MM');
+  final timeFormatter = DateFormat('HH:mm');
 
   void signOut() {
     FirebaseAuth.instance.signOut();
@@ -110,58 +99,83 @@ class MainPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Center(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            buildMiniGauge(progressValue, gaugeWidth),
-            const SizedBox(height: 16), // Space between gauge and title
-            const Text(
-              'Average Safety Score',
-              style: TextStyle(
-                fontSize: 18, // Adjust the size as needed
-                fontWeight: FontWeight.normal,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 25),
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                    height: 400,
-                    child: StreamBuilder(
-                        stream: service.getDrivingStory(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                                  ConnectionState.waiting ||
-                              snapshot.connectionState ==
-                                  ConnectionState.none) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Text(
-                                'Error with fetching data: ${snapshot.data}');
-                          } else if (snapshot.hasData &&
-                              snapshot.data?.docs.isEmpty == true) {
-                            return const Center(
-                                child: Text('Empty collection'));
-                          }
-                          final documents = snapshot.data?.docs;
-                          return ListView.builder(
-                              shrinkWrap: true,
-                              physics: const BouncingScrollPhysics(),
-                              itemCount: documents?.length,
-                              itemBuilder: (context, index) {
-                                return Card(
-                                  color: const Color(0xFFFFFFFF),
-                                  margin: const EdgeInsets.all(5.0),
-                                  child: ListTile(
-                                    leading: const Text('time'),
-                                    title: Text('Aggressiveness: ${documents?[index]['aggressiveRate']}%'),
-                                    subtitle: Text('Normal: ${documents?[index]['normalRate']}%'),
-                                    trailing: buildMiniGauge(documents?[index]['safetyScore'].toDouble(), 60),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // StreamBuilder for calculating average safety score
+              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: service.getDrivingStory(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text('No data available.'));
+                  }
+
+                  final documents = snapshot.data!.docs;
+
+                  // Calculate the sum of safety scores
+                  double totalSafetyScore = 0;
+                  for (var doc in documents) {
+                    totalSafetyScore += (doc.data()['safetyScore'] as num).toDouble();
+                  }
+
+                  // Calculate the average safety score
+                  double averageSafetyScore = totalSafetyScore / documents.length;
+
+                  return Column(
+                    children: [
+                      buildMiniGauge(averageSafetyScore, gaugeWidth),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Average Safety Score',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 25),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          height: 400,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: documents.length,
+                            itemBuilder: (context, index) {
+                              return Card(
+                                color: const Color(0xFFFFFFFF),
+                                margin: const EdgeInsets.all(5.0),
+                                child: ListTile(
+                                  leading: Text(
+                                    '${dateFormatter.format((documents[index]['time'] as Timestamp).toDate())}\n'
+                                        '${timeFormatter.format((documents[index]['time'] as Timestamp).toDate())}',
                                   ),
-                                );
-                              });
-                        })))
-          ]),
+                                  subtitle: Text(
+                                    'Aggressiveness: ${documents[index]['aggressiveRate']}%\n'
+                                        'Normal: ${documents[index]['normalRate']}%\n'
+                                        'Drowsiness: ${documents[index]['drowsyRate']}',
+                                  ),
+                                  trailing: buildMiniGauge(
+                                    (documents[index]['safetyScore'] as num).toDouble(),
+                                    60,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
