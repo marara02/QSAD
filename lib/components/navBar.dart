@@ -3,16 +3,14 @@ import 'package:safedriving/pages/homePage.dart';
 import 'package:safedriving/pages/mainPage.dart';
 import 'package:safedriving/pages/profile.dart';
 
-/// Flutter code sample for [NavigationBar].
-
-class NavigationExample extends StatefulWidget {
-  const NavigationExample({super.key});
+class NavigationBarWidget extends StatefulWidget {
+  const NavigationBarWidget({super.key});
 
   @override
-  State<NavigationExample> createState() => _NavigationExampleState();
+  State<NavigationBarWidget> createState() => _NavigationBarWidgetState();
 }
 
-class _NavigationExampleState extends State<NavigationExample> {
+class _NavigationBarWidgetState extends State<NavigationBarWidget> {
   int currentPageIndex = 0;
 
   @override
@@ -36,7 +34,8 @@ class _NavigationExampleState extends State<NavigationExample> {
           ),
         ),
         child: NavigationBar(
-          backgroundColor: Colors.transparent, // Background is transparent to show the gradient
+          backgroundColor: Colors.transparent,
+          // Background is transparent to show the gradient
           onDestinationSelected: (int index) {
             setState(() {
               currentPageIndex = index;

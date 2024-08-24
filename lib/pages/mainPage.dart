@@ -64,12 +64,10 @@ class MainPage extends StatelessWidget {
               ),
             ],
           ),
-          // Text displaying the progress value
           Text(
             '${progressValue.toInt()}%',
             style: TextStyle(
               fontSize: gaugeWidth * 0.15,
-              // Adjust size according to the gauge size
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),

@@ -3,8 +3,8 @@ class DrivingResult {
   final DateTime date;
   final int aggressiveRate;
   final int normalRate;
-  final double drowsyRate;
-  final int safetyScore;
+  final int drowsyRate;
+  final double safetyScore;
 
   DrivingResult(this.username, this.date, this.aggressiveRate, this.normalRate, this.drowsyRate, this.safetyScore);
 
@@ -12,7 +12,7 @@ class DrivingResult {
   DateTime get getDate => date;
   int get getAggressiveRate => aggressiveRate;
   int get getNormalRate => normalRate;
-  double get getDrowsyRate => drowsyRate;
-  int get getSafetyScore => safetyScore;
+  int get getDrowsyRate => drowsyRate;
+  double get getSafetyScore => safetyScore;
 
 }

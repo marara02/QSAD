@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:safedriving/components/button.dart';
@@ -32,10 +33,21 @@ class _RegisterPageState extends State<RegisterPage>{
       return;
     }
     try{
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailTextController.text,
           password: passwordTextController.text
       );
+
+      // Creating User's collection
+      FirebaseFirestore.instance.collection("Users").doc(userCredential.user?.email).set({
+        'first_name' : firstnameTextController.text,
+        'last_name': lastnameTextController.text,
+        'username': emailTextController.text.split('@'),
+        'date_birth': dateBirthController.text,
+        'gender': 'Other',
+        'citizenship': 'United Kingdom',
+        'home_country': 'United Kingdom'
+      });
       if(context.mounted) Navigator.pop(context);
     } on FirebaseAuthException catch(e){
       Navigator.pop(context);
@@ -53,7 +65,7 @@ class _RegisterPageState extends State<RegisterPage>{
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
-      body: SafeArea(
+      body: SingleChildScrollView(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),

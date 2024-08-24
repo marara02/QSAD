@@ -1,55 +1,136 @@
-import 'utils/coordinates_painter.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+import 'package:camera/camera.dart';
+import 'package:tflite_v2/tflite_v2.dart';
+import 'dart:math' as math;
+import 'coordinates.dart';
 
-class FaceDetectorPainter extends CustomPainter {
-  final List<Face> faces;
-  final Size absoluteImageSize;
-  final InputImageRotation rotation;
+// the problem is my code not returning probability, its returning predictions
+class DrowsinessDetectionLive extends StatefulWidget {
+  @override
+  _DrowsinessDetectionLiveState createState() =>
+      _DrowsinessDetectionLiveState();
+}
 
-  FaceDetectorPainter(this.faces, this.absoluteImageSize, this.rotation);
+class _DrowsinessDetectionLiveState
+    extends State<DrowsinessDetectionLive> {
+  List<CameraDescription> _availableCameras = [];
+  CameraController? cameraController;
+  bool isDetecting = false;
+  List<dynamic> _recognitions = [];
+  int _imageHeight = 0;
+  int _imageWidth = 0;
+  bool front = true;
 
   @override
-  void paint(final Canvas canvas, final Size size) {
-    final Paint paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0
-      ..color = Colors.blue;
-    for (final Face face in faces) {
-      canvas.drawRect(
-        Rect.fromLTRB(
-          translateX(face.boundingBox.left, rotation, size, absoluteImageSize),
-          translateY(face.boundingBox.top, rotation, size, absoluteImageSize),
-          translateX(face.boundingBox.right, rotation, size, absoluteImageSize),
-          translateY(
-              face.boundingBox.bottom, rotation, size, absoluteImageSize),
-        ),
-        paint,
-      );
-      //draw the blue circle for detectd points of the face
-      void paintCountour(final FaceContourType type) {
-        final faceContour = face.contours[type];
-        if(faceContour?.points!=null){
-          for(final point in faceContour!.points){
-            canvas.drawCircle(
-              Offset(
-                translateX(point.x.toDouble(), rotation, size, absoluteImageSize),
-                translateY(point.y.toDouble(), rotation, size, absoluteImageSize),
-              ),
-              1.0,
-              paint,
-            );
+  void initState() {
+    super.initState();
+    loadModel();
+    _getAvailableCameras();
+  }
+
+  @override
+  void dispose() {
+    cameraController?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _getAvailableCameras() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    _availableCameras = await availableCameras();
+    _initializeCamera(_availableCameras[0]);
+  }
+
+  void loadModel() async {
+    await Tflite.loadModel(
+      model: "assets/model.tflite",
+      labels: "assets/label.txt",
+    );
+  }
+
+  Future<void> _initializeCamera(CameraDescription description) async {
+    cameraController = CameraController(description, ResolutionPreset.high);
+    try {
+      await cameraController?.initialize().then(
+        (_) {
+          if (!mounted) {
+            return;
           }
-        }
-      }
-      paintCountour(FaceContourType.face);
-      paintCountour(FaceContourType.leftEye);
-      paintCountour(FaceContourType.rightEye);
+          cameraController?.startImageStream(
+            (CameraImage img) {
+              if (!isDetecting) {
+                isDetecting = true;
+                Tflite.runModelOnFrame(
+                  bytesList: img.planes.map(
+                    (plane) {
+                      return plane.bytes;
+                    },
+                  ).toList(),
+                  threshold: 0.5,
+                  rotation: 0,
+                  imageHeight: img.height,
+                  imageWidth: img.width,
+                  numResults: 1,
+                ).then(
+                  (recognitions) {
+                    setRecognitions(recognitions, img.height, img.width);
+                    isDetecting = false;
+                  },
+                );
+              }
+            },
+          );
+        },
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void setRecognitions(recognitions, imageHeight, imageWidth) {
+    if (mounted) {
+      setState(() {
+        _recognitions = recognitions;
+        _imageHeight = imageHeight;
+        _imageWidth = imageWidth;
+      });
     }
   }
 
   @override
-  bool shouldRepaint(final FaceDetectorPainter oldDelegate) {
-    return oldDelegate.absoluteImageSize!= absoluteImageSize||oldDelegate.faces!=faces;
+  Widget build(BuildContext context) {
+    print('Output $_recognitions');
+    Size screen = MediaQuery.of(context).size;
+    return Container(
+        constraints: const BoxConstraints.expand(),
+        child: cameraController!.value.isInitialized
+            ? Scaffold(
+                backgroundColor: Colors.white,
+                body: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SizedBox(
+                        width: 500,
+                        child: AspectRatio(
+                          aspectRatio: 1 / cameraController!.value.aspectRatio,
+                          child: CameraPreview(cameraController!),
+                        ),
+                      ),
+                    ),
+                    CameraView(
+                      _recognitions ?? [],
+                      math.max(_imageHeight, _imageWidth),
+                      math.min(_imageHeight, _imageWidth),
+                      screen.height,
+                      screen.width,
+                    ),
+                    const SizedBox(height: 50),
+                  ],
+                ),
+              )
+            : Container(
+                alignment: Alignment.center,
+                child: CircularProgressIndicator(),
+              ));
   }
 }

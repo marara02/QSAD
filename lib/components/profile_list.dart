@@ -5,11 +5,13 @@ class ProfileMenuWidget extends StatelessWidget {
       {super.key,
       required this.title,
       required this.icon,
-      required this.onPress});
+      required this.onPress,
+      required this.textColor});
 
   final String title;
   final IconData icon;
   final VoidCallback onPress;
+  final Color? textColor;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class ProfileMenuWidget extends StatelessWidget {
         ),
         child:  Icon(icon, color: const Color(0xFF65BEFF)),
       ),
-      title: Text(title, style: Theme.of(context).textTheme.bodyMedium),
+      title: Text(title, style: Theme.of(context).textTheme.bodyMedium?.apply(color: textColor)),
       trailing: Container(
         width: 30,
         height: 30,
