@@ -1,9 +1,10 @@
 # safedriving
 
-A new Flutter project.
+QSAD - safe driving identification app
+Getting sensors data with reorientation and drowsiness detection of driver. 
 
-Saving sensors data to csv and show graph of changes for driving session.
-![img.png](img.png)
+
+
 
 ## Getting Started
 
