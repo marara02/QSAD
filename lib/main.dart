@@ -9,7 +9,6 @@ import 'package:safedriving/firebase_options.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'auth/login_or_reg.dart';
 import 'sensorsData/accelerometer.dart';
-import 'drowsinessDetect/camera.dart';
 import 'sensorsData/gyroscope.dart';
 import 'save_data.dart';
 import 'sensorsData/euler_sensors_data.dart';

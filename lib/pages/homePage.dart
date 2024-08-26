@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:safedriving/auth/login.dart';
-import 'package:safedriving/drowsinessDetect/detector.dart';
 import 'package:safedriving/drowsinessDetect/face_detecter.dart';
 import 'package:safedriving/sensorsData/driving_result.dart';
 import 'package:safedriving/services/add_data.dart';
@@ -14,12 +13,12 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:safedriving/save_data.dart';
 import 'package:safedriving/auth/login_or_reg.dart';
 import 'package:safedriving/sensorsData/accelerometer.dart';
-import 'package:safedriving/drowsinessDetect/camera.dart';
 import 'package:safedriving/sensorsData/gyroscope.dart';
 import 'package:safedriving/save_data.dart';
 import 'package:safedriving/sensorsData/euler_sensors_data.dart';
 import 'package:http/http.dart' as http;
 
+import '../components/button.dart';
 import '../components/switch.dart';
 import 'chart.dart';
 
@@ -64,13 +63,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     _accelerometerValues?.map((double v) => v.toStringAsFixed(1)).toList();
     _gyroscopeValues?.map((double v) => v.toStringAsFixed(1)).toList();
-    _userAccelerometerValues
-        ?.map((double v) => v.toStringAsFixed(1))
-        .toList();
+    _userAccelerometerValues?.map((double v) => v.toStringAsFixed(1)).toList();
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF1FAFF),
       appBar: AppBar(
-        title: const Text('Live Sensor Data'),
+        title: const Text('Track driving session'),
+        backgroundColor: const Color(0xFFF1FAFF),
         actions: [
           IconButton(
             onPressed: signOut,
@@ -147,17 +146,26 @@ class _MyHomePageState extends State<MyHomePage> {
                   //     ],
                   //   ),
                   // ),
-                  ElevatedButton(
-                    onPressed: _startCollectingData,
-                    child: const Text("Start driving"),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        MyElevatedButton(
+                          onPressed: _startCollectingData,
+                          text: 'Start driving',
+                          gradient: const LinearGradient(
+                              colors: [Colors.cyan, Colors.indigo]),
+                        ),
+                        const SizedBox(width: 20),
+                        MyElevatedButton(
+                            onPressed: _stopCollectingData,
+                            text: 'Stop driving',
+                            gradient: const LinearGradient(
+                                colors: [Color(0xFFb21c0e), Color(0xFFcb0e40)]))
+                      ],
                     ),
-                    onPressed: _stopCollectingData,
-                    child: const Text("Stop driving"),
-                  ),
+                  )
                 ],
               ),
             ),

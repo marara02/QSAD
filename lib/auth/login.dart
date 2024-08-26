@@ -46,7 +46,7 @@ class _RegisterPageState extends State<LoginPage>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.grey[300],
+        backgroundColor: const Color(0xFFE1F7F5),
         body: SafeArea(
           child: Center(
               child: Padding(
@@ -55,15 +55,15 @@ class _RegisterPageState extends State<LoginPage>{
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(
-                      Icons.lock,
+                      Icons.car_repair_rounded,
                       size: 100,
                     ),
                     const SizedBox(height: 50),
-
                     Text(
                       "Log in to start drive",
                       style: TextStyle(
                         color: Colors.grey[700],
+                        fontSize: 30
                       ),
                     ),
 

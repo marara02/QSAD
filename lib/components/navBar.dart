@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:safedriving/pages/homePage.dart';
+import 'package:safedriving/pages/info_page.dart';
 import 'package:safedriving/pages/mainPage.dart';
 import 'package:safedriving/pages/profile.dart';
 
@@ -49,11 +50,11 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
               icon: Icon(Icons.analytics_outlined),
               label: 'History',
             ),
-            NavigationDestination(
-              selectedIcon: Icon(Icons.message),
-              icon: Icon(Icons.message_outlined),
-              label: 'Help',
-            ),
+            // NavigationDestination(
+            //   selectedIcon: Icon(Icons.message),
+            //   icon: Icon(Icons.message_outlined),
+            //   label: 'Help',
+            // ),
             NavigationDestination(
               icon: Badge(child: Icon(Icons.car_repair)),
               label: 'Drive',
@@ -70,8 +71,8 @@ class _NavigationBarWidgetState extends State<NavigationBarWidget> {
         /// History page
         MainPage(),
 
-        /// Help page
-        const Text("There will be Help page ..."),
+        // /// Help page
+        // InfoPage(),
 
         /// New Driving page
         const MyHomePage(),

@@ -117,11 +117,13 @@ class MainPage extends StatelessWidget {
                   // Calculate the sum of safety scores
                   double totalSafetyScore = 0;
                   for (var doc in documents) {
-                    totalSafetyScore += (doc.data()['safetyScore'] as num).toDouble();
+                    totalSafetyScore +=
+                        (doc.data()['safetyScore'] as num).toDouble();
                   }
 
                   // Calculate the average safety score
-                  double averageSafetyScore = totalSafetyScore / documents.length;
+                  double averageSafetyScore =
+                      totalSafetyScore / documents.length;
 
                   return Column(
                     children: [
@@ -151,15 +153,16 @@ class MainPage extends StatelessWidget {
                                 child: ListTile(
                                   leading: Text(
                                     '${dateFormatter.format((documents[index]['time'] as Timestamp).toDate())}\n'
-                                        '${timeFormatter.format((documents[index]['time'] as Timestamp).toDate())}',
+                                    '${timeFormatter.format((documents[index]['time'] as Timestamp).toDate())}',
                                   ),
                                   subtitle: Text(
-                                    'Aggressiveness: ${documents[index]['aggressiveRate']}%\n'
-                                        'Normal: ${documents[index]['normalRate']}%\n'
-                                        'Drowsiness: ${documents[index]['drowsyRate']}',
-                                  ),
+                                      'Aggressiveness: ${documents[index]['aggressiveRate']}%\n'
+                                      'Normal: ${documents[index]['normalRate']}%\n'
+                                      'Drowsiness: ${documents[index]['drowsyRate']}',
+                                      style: const TextStyle(fontSize: 20)),
                                   trailing: buildMiniGauge(
-                                    (documents[index]['safetyScore'] as num).toDouble(),
+                                    (documents[index]['safetyScore'] as num)
+                                        .toDouble(),
                                     60,
                                   ),
                                 ),

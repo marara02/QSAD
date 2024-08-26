@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:safedriving/drowsinessDetect/prediction.dart';
 import 'package:tflite_v2/tflite_v2.dart';
 import 'dart:math' as math;
-import 'coordinates.dart';
 
 // the problem is my code not returning probability, its returning predictions
 class DrowsinessDetectionLive extends StatefulWidget {
