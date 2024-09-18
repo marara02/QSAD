@@ -16,7 +16,7 @@ class CameraView extends StatelessWidget {
     List<Widget> _renderStrings() {
       return results.map((re) {
         try {
-          if (re["label"] == '0' && (re["confidence"] * 100 > 70)) {
+          if (re["label"] == '0' && (re["confidence"] * 100 > 80)) {
             FlutterRingtonePlayer.play(
               android: AndroidSounds.notification,
               ios: IosSounds.glass,
